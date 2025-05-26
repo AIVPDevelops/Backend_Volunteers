@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
         try {
             return repository.findAll();
         } catch (Exception e) {
-            throw new DatabaseException(Constants.MESSAGE_INTERNAL_DATABASE_ERROR.concat(e.getMessage()), e);
+            throw new DatabaseException(Constants.MESSAGE_INTERNAL_DATABASE_ERROR, e);
         }
     }
 
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
         try {
             return repository.findByEmail(email);
         } catch (Exception e) {
-            throw new DatabaseException(Constants.MESSAGE_INTERNAL_DATABASE_ERROR.concat(e.getMessage()), e);
+            throw new DatabaseException(Constants.MESSAGE_INTERNAL_DATABASE_ERROR, e);
         }
     }
 
@@ -42,5 +42,13 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .enabled(user.getEnabled())
                 .role(user.getRole().getName()).build();
+    }
+    @Override
+    public UserEntity save(UserEntity user) {
+        try {
+            return repository.save(user);
+        } catch (Exception e) {
+            throw new DatabaseException(Constants.MESSAGE_INTERNAL_DATABASE_ERROR, e);
+        }
     }
 }

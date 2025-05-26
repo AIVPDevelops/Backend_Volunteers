@@ -1,0 +1,73 @@
+name: CD - Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy
+        type: choice
+        options:
+          - 'DEV'
+          - 'PROD'
+        required: true
+        default: 'DEV'
+
+jobs:
+  continuos_integration:
+    uses: ./.github/workflows/ci-workflow-backend.yaml
+    secrets: inherit
+
+  continuos-deployment:
+    environment: ${{ inputs.environment || 'DEV' }}
+    runs-on: ubuntu-latest
+    needs: continuos_integration
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create .env file with actual values
+        run: |
+          echo "SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE }}" > deploy/.env
+          echo "APP_PORT=${{ vars.APP_PORT }}" >> deploy/.env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> deploy/.env
+          echo "DB_USERNAME=${{ vars.DB_USERNAME }}" >> deploy/.env
+          echo "DB_HOST=${{ vars.DB_HOST }}" >> deploy/.env
+          echo "DB_PORT=${{ vars.DB_PORT }}" >> deploy/.env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> deploy/.env
+          echo "DB_NAME=${{ vars.DB_NAME }}" >> deploy/.env
+
+      - name: Print .env file contents (for debug)
+        run: cat deploy/.env
+
+      - name: Copy docker-compose to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ vars.EC2_HOST }}
+          username: ${{vars.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "deploy/*"
+          target: "backend/"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ vars.EC2_HOST }}
+          username: ${{vars.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd backend/deploy
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            echo "${{ secrets.GHCR_PASSWORD }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull
+            docker compose up -d --remove-orphans
