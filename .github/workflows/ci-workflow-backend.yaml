@@ -7,6 +7,9 @@ on:
         required: false
         type: string
         default: ${{vars.IMAGE_ID}}
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
