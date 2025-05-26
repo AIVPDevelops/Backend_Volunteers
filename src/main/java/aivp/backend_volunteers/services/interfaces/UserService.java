@@ -12,4 +12,6 @@ public interface UserService {
     Optional<UserEntity> findByEmail(String email);
 
     UserResponseDto transformResponse(UserEntity user);
+
+    UserEntity save(UserEntity user);
 }

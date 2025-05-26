@@ -29,4 +29,5 @@ public class Constants {
     public static final String USER_NOT_FOUND_BY_EMAIL = "Usuario no encontrado con email: ";
     public static final String USER_NOT_FOUND = "Usuario no encontrado.";
     public static final String UNEXPECTED_ERROR = "Unexpected error: ";
+    public static final String BACKEND_STATUS_OK = "Backend is running perfectly.";
 }
