@@ -18,7 +18,7 @@ permissions:
 jobs:
   continuos_integration:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'DEV' || 'PROD' }}
+    environment: ${{ (github.event_name == 'pull_request' && github.base_ref == 'main') || (github.ref == 'refs/heads/main') && 'DEV' || 'PROD' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
