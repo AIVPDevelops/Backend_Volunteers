@@ -45,6 +45,8 @@ jobs:
           echo "DB_PORT=${{ vars.DB_PORT }}" >> deploy/.env
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> deploy/.env
           echo "DB_NAME=${{ vars.DB_NAME }}" >> deploy/.env
+          echo "IMAGE_ID=${{ vars.IMAGE_ID }}" >> deploy/.env
+          
 
       - name: Print .env file contents (for debug)
         run: cat deploy/.env
