@@ -55,6 +55,6 @@ public class AuthServiceImpl implements AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build());
 
-        return "Usuario con email:".concat(request.getEmail()).concat(" registrado correctamente.");
+        return "Usuario con email:".concat(user.getEmail()).concat(" registrado correctamente.");
     }
 }
