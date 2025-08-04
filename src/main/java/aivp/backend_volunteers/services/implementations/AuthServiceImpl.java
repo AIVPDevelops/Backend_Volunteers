@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -49,6 +50,8 @@ public class AuthServiceImpl implements AuthService {
     public String signUp(SignUpRequestDto request) {
         Optional<RoleEntity> role = roleService.findById(request.getRoleId());
         UserEntity user = userService.save(UserEntity.builder()
+                .fullName(request.getFullName())
+                .createdAt(LocalDateTime.now())
                 .email(request.getEmail())
                 .enabled(true)
                 .role(role.orElse(null))
